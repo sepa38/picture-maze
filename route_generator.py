@@ -21,26 +21,44 @@ class RouteGenerator:
         self.fig.canvas.mpl_connect("motion_notify_event", self.on_motion)
         self.fig.canvas.mpl_connect("key_press_event", self.on_key)
 
+    def whiten_connection(self, row, col, adj_row, adj_col):
+        if adj_row == row + 1:
+            self.ax.add_patch(plt.Rectangle((col + 0.4, row + 0.6), 0.2, 0.4, color="white"))
+        elif adj_row == row - 1:
+            self.ax.add_patch(plt.Rectangle((col + 0.4, row), 0.2, 0.4, color="white"))
+        elif adj_col == col + 1:
+            self.ax.add_patch(plt.Rectangle((col + 0.6, row + 0.4), 0.4, 0.2, color="white"))
+        elif adj_col == col - 1:
+            self.ax.add_patch(plt.Rectangle((col, row + 0.4), 0.4, 0.2, color="white"))
+
     def update_plot(self):
         self.ax.clear()
-        for row in range(self.rows):
-            for col in range(self.cols):
-                color = "white"
-                if (row, col) == self.current:
-                    color = "red"
-                elif self.grid[row, col] == 1:
-                    color = "black"
-                self.ax.add_patch(plt.Rectangle((col, row), 1, 1, color=color))
+        for i in range(len(self.visited_stack) - 1):
+            row, col = self.visited_stack[i]
+
+            self.ax.add_patch(plt.Rectangle((col, row), 1, 1, color="black"))
+            self.ax.add_patch(plt.Rectangle((col + 0.4, row + 0.4), 0.2, 0.2, color="white"))
+
+            # Whiten the connection to the next cell.
+            next_row, next_col = self.visited_stack[i + 1]
+            self.whiten_connection(row, col, next_row, next_col)
+
+            # Whiten the connection to the previous cell.
+            if i > 0:
+                prev_row, prev_col = self.visited_stack[i - 1]
+                self.whiten_connection(row, col, prev_row, prev_col)
+
+        # Redden the current cell
+        row, col = self.current
+        self.ax.add_patch(plt.Rectangle((col, row), 1, 1, color="red"))
 
         self.ax.set_xlim(0, self.cols)
         self.ax.set_ylim(0, self.rows)
         self.ax.set_xticks(np.arange(0, self.cols + 1, 1))
         self.ax.set_yticks(np.arange(0, self.rows + 1, 1))
         self.ax.grid(which="both", color="black", linestyle="-", linewidth=1)
-        self.ax.tick_params(
-            left=False, bottom=False, labelleft=False, labelbottom=False
-        )
-        self.ax.set_aspect(self.rows / self.cols)
+        self.ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+        self.ax.set_aspect("equal")
 
     def move_to(self, new_pos):
         row, col = new_pos
@@ -69,7 +87,7 @@ class RouteGenerator:
             delta = moves[event.key]
             new_pos = (self.current[0] + delta[0], self.current[1] + delta[1])
             self.move_to(new_pos)
-        elif event.key == "u" and len(self.visited_stack) > 1:
+        elif event.key == "u" and len(self.visited_stack) > 1:  # undo
             popped = self.visited_stack.pop()
             self.grid[popped] = 0
             self.current = self.visited_stack[-1]
