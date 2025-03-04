@@ -81,7 +81,7 @@ class MazeGenerator:
         for row in reversed(self.maze):
             print("".join(row))
 
-    def show_maze(self, show_solution=False):
+    def show_maze(self, show_solution=False, filename=None):
         fig, ax = plt.subplots(figsize=(self.cols, self.rows))
         ax.set_xlim(0, 2 * self.cols + 1)
         ax.set_ylim(0, 2 * self.rows + 1)
@@ -111,4 +111,10 @@ class MazeGenerator:
                     )
                 prev_r, prev_c = r, c
 
-        plt.show()
+        if filename:
+            plt.savefig(filename, bbox_inches="tight")
+            print(f"Saved maze to {filename}")
+        else:
+            plt.show()
+
+        plt.close(fig)
