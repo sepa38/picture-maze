@@ -81,7 +81,7 @@ class MazeGenerator:
         for row in reversed(self.maze):
             print("".join(row))
 
-    def show_maze(self):
+    def show_maze(self, show_solution=False):
         fig, ax = plt.subplots(figsize=(self.cols, self.rows))
         ax.set_xlim(0, 2 * self.cols + 1)
         ax.set_ylim(0, 2 * self.rows + 1)
@@ -97,5 +97,18 @@ class MazeGenerator:
                     ax.add_patch(plt.Rectangle((c, r), 1, 1, color="blue"))
                 elif self.maze[r, c] == "G":
                     ax.add_patch(plt.Rectangle((c, r), 1, 1, color="red"))
+
+        if show_solution:
+            prev_r, prev_c = self.route[0]
+            for i in range(1, len(self.route)):
+                r, c = self.route[i]
+                ax.add_patch(  # Paint the connections
+                    plt.Rectangle((c + prev_c + 1, r + prev_r + 1), 1, 1, color="yellow")
+                )
+                if i < len(self.route) - 1:  # Goal cell should not be painted.
+                    ax.add_patch(  # Paint the route corridor
+                        plt.Rectangle((2 * c + 1, 2 * r + 1), 1, 1, color="yellow")
+                    )
+                prev_r, prev_c = r, c
 
         plt.show()
