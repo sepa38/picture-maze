@@ -80,3 +80,22 @@ class MazeGenerator:
     def print_maze(self):
         for row in reversed(self.maze):
             print("".join(row))
+
+    def show_maze(self):
+        fig, ax = plt.subplots(figsize=(self.cols, self.rows))
+        ax.set_xlim(0, 2 * self.cols + 1)
+        ax.set_ylim(0, 2 * self.rows + 1)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_aspect("equal")
+
+        for r in range(2 * self.rows + 1):
+            for c in range(2 * self.cols + 1):
+                if self.maze[r, c] == "#":
+                    ax.add_patch(plt.Rectangle((c, 2 * self.rows - r), 1, 1, color="black"))
+                elif self.maze[r, c] == "S":
+                    ax.add_patch(plt.Rectangle((c, 2 * self.rows - r), 1, 1, color="blue"))
+                elif self.maze[r, c] == "G":
+                    ax.add_patch(plt.Rectangle((c, 2 * self.rows - r), 1, 1, color="red"))
+
+        plt.show()
