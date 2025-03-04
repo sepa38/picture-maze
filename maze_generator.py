@@ -92,10 +92,10 @@ class MazeGenerator:
         for r in range(2 * self.rows + 1):
             for c in range(2 * self.cols + 1):
                 if self.maze[r, c] == "#":
-                    ax.add_patch(plt.Rectangle((c, 2 * self.rows - r), 1, 1, color="black"))
+                    ax.add_patch(plt.Rectangle((c, r), 1, 1, color="black"))
                 elif self.maze[r, c] == "S":
-                    ax.add_patch(plt.Rectangle((c, 2 * self.rows - r), 1, 1, color="blue"))
+                    ax.add_patch(plt.Rectangle((c, r), 1, 1, color="blue"))
                 elif self.maze[r, c] == "G":
-                    ax.add_patch(plt.Rectangle((c, 2 * self.rows - r), 1, 1, color="red"))
+                    ax.add_patch(plt.Rectangle((c, r), 1, 1, color="red"))
 
         plt.show()
