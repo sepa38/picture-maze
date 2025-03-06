@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 
 
 class RouteGenerator:
-    def __init__(self, rows, cols):
+    def __init__(self, rows, cols, start_pos=(0, 0)):
         self.rows = rows
         self.cols = cols
         self.grid = np.zeros((rows, cols))
-        self.current = (0, 0)
+        self.current = start_pos
         self.visited_stack = [self.current]
         self.grid[self.current] = 1
         self.is_dragging = False
@@ -118,6 +118,10 @@ class RouteGenerator:
 
 if __name__ == "__main__":
     rows, cols = map(int, input().split())
-    generator = RouteGenerator(rows, cols)
+    start_pos = tuple(map(int, input().split()))
+    if start_pos:
+        generator = RouteGenerator(rows, cols, start_pos)
+    else:
+        generator = RouteGenerator(rows, cols)
     generator.show()
     generator.save_route()
