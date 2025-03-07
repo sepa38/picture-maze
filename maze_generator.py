@@ -118,3 +118,18 @@ class MazeGenerator:
             plt.show()
 
         plt.close(fig)
+
+
+if __name__ == "__main__":
+    rows, cols = map(int, input().split())
+    start_pos = tuple(map(int, input().split()))
+    if start_pos:
+        route_generator = RouteGenerator(rows, cols, start_pos)
+    else:
+        route_generator = RouteGenerator(rows, cols)
+    route_generator.show()
+
+    maze_gen = MazeGenerator(rows, cols, route_generator.visited_stack)
+    maze_gen.generate_maze()
+    maze_gen.show_maze()
+    maze_gen.show_maze(show_solution=True)
