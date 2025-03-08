@@ -82,7 +82,7 @@ class MazeGenerator:
             print("".join(row))
 
     def show_maze(self, show_solution=False, filename=None):
-        fig, ax = plt.subplots(figsize=(self.cols, self.rows))
+        fig, ax = plt.subplots()
         ax.set_xlim(0, 2 * self.cols + 1)
         ax.set_ylim(0, 2 * self.rows + 1)
         ax.set_xticks([])
