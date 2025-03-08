@@ -81,34 +81,68 @@ class MazeGenerator:
         for row in reversed(self.maze):
             print("".join(row))
 
-    def show_maze(self, show_solution=False, filename=None):
+    def show_maze(self, show_solution=False, filename=None, wall_width=1):
         fig, ax = plt.subplots()
-        ax.set_xlim(0, 2 * self.cols + 1)
-        ax.set_ylim(0, 2 * self.rows + 1)
+        grid_size = 1 + wall_width  # route + wall as 1 unit
+        ax.set_xlim(0, self.cols * grid_size + wall_width)
+        ax.set_ylim(0, self.rows * grid_size + wall_width)
         ax.set_xticks([])
         ax.set_yticks([])
         ax.set_aspect("equal")
 
+        def cell_to_coord(r, c):
+            return c // 2 * grid_size, r // 2 * grid_size
+
         for r in range(2 * self.rows + 1):
             for c in range(2 * self.cols + 1):
+                x, y = cell_to_coord(r, c)
+
                 if self.maze[r, c] == "#":
-                    ax.add_patch(plt.Rectangle((c, r), 1, 1, color="black"))
+                    if r % 2 == 0 and c % 2 == 0:  # wall intersection
+                        ax.add_patch(
+                            plt.Rectangle((x, y), wall_width, wall_width, color="black")
+                        )
+                    elif r % 2 == 0:  # horizontal wall
+                        ax.add_patch(
+                            plt.Rectangle((x + wall_width, y), 1, wall_width, color="black")
+                        )
+                    else:  # vertical wall
+                        ax.add_patch(
+                            plt.Rectangle((x, y + wall_width), wall_width, 1, color="black")
+                        )
                 elif self.maze[r, c] == "S":
-                    ax.add_patch(plt.Rectangle((c, r), 1, 1, color="blue"))
+                    ax.add_patch(
+                        plt.Rectangle((x + wall_width, y + wall_width), 1, 1, color="blue")
+                    )
                 elif self.maze[r, c] == "G":
-                    ax.add_patch(plt.Rectangle((c, r), 1, 1, color="red"))
+                    ax.add_patch(
+                        plt.Rectangle((x + wall_width, y + wall_width), 1, 1, color="red")
+                    )
 
         if show_solution:
+
+            def paint_route(r, c):
+                x, y = cell_to_coord(r, c)
+                if r % 2 == 1 and c % 2 == 1:  # route cell
+                    ax.add_patch(
+                        plt.Rectangle((x + wall_width, y + wall_width), 1, 1, color="yellow")
+                    )
+                elif r % 2 == 1:  # vertical route
+                    ax.add_patch(
+                        plt.Rectangle((x, y + wall_width), wall_width, 1, color="yellow")
+                    )
+                else:  # horizontal route
+                    ax.add_patch(
+                        plt.Rectangle((x + wall_width, y), 1, wall_width, color="yellow")
+                    )
+
             prev_r, prev_c = self.route[0]
             for i in range(1, len(self.route)):
                 r, c = self.route[i]
-                ax.add_patch(  # Paint the connections
-                    plt.Rectangle((c + prev_c + 1, r + prev_r + 1), 1, 1, color="yellow")
-                )
+
+                paint_route(r + prev_r + 1, c + prev_c + 1)  # Paint the connections
                 if i < len(self.route) - 1:  # Goal cell should not be painted.
-                    ax.add_patch(  # Paint the route corridor
-                        plt.Rectangle((2 * c + 1, 2 * r + 1), 1, 1, color="yellow")
-                    )
+                    paint_route(2 * r + 1, 2 * c + 1)  # Paint the route corridor
                 prev_r, prev_c = r, c
 
         if filename:
@@ -131,5 +165,5 @@ if __name__ == "__main__":
 
     maze_gen = MazeGenerator(rows, cols, route_generator.visited_stack)
     maze_gen.generate_maze()
-    maze_gen.show_maze()
-    maze_gen.show_maze(show_solution=True)
+    maze_gen.show_maze(wall_width=1 / 2)
+    maze_gen.show_maze(show_solution=True, wall_width=1 / 2)
