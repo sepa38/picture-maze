@@ -10,6 +10,9 @@ class MazeGenerator:
         self.rows = rows
         self.cols = cols
         self.route = route
+        self.clear_maze()
+
+    def clear_maze(self):
         self.maze = np.full(  # Initialize everything with walls.
             (2 * rows + 1, 2 * cols + 1), "#"
         )
